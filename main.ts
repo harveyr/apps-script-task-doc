@@ -28,13 +28,33 @@ function handleCreateTaskDoc() {
     )
     return
   }
-  const selectedText = elements[0].getElement().asText().getText()
-  const newDocName = `[task] ${selectedText}`
+  const selected = elements[0].getElement().asText()
+  const taskDocName = `[task] ${selected.getText()}`
 
-  const existing = DriveApp.getFilesByName(newDocName)
+  let docId: string = ''
+  let docUrl: string = ''
+  const existingList = DriveApp.getFilesByName(taskDocName)
+  if (existingList.hasNext()) {
+    const existing = existingList.next()
+    docId = existing.getId()
+    docUrl = existing.getUrl()
+    console.log('Found existing doc', docUrl)
+  } else {
+    const newDoc = DocumentApp.create(taskDocName)
+    docId = newDoc.getId()
+    docUrl = newDoc.getUrl()
+    console.log('Created new doc', newDoc.getUrl())
+  }
 
-  //   const destFolder = DriveApp.getFolderById(TASK_NOTES_FOLDER_ID)
+  if (!docId) {
+    throw new Error(`Failed to set docId`)
+  }
+  if (!docUrl) {
+    throw new Error(`Failed to set docUrl`)
+  }
 
-  //   const newDoc = DocumentApp.create()
-  //   DriveApp.getFileById(newDoc.getId()).moveTo(destFolder)
+  selected.setText(taskDocName).setLinkUrl(docUrl)
+
+  const destFolder = DriveApp.getFolderById(TASK_NOTES_FOLDER_ID)
+  DriveApp.getFileById(docId).moveTo(destFolder)
 }
