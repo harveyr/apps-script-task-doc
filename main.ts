@@ -28,11 +28,13 @@ function handleCreateTaskDoc() {
     )
     return
   }
+
   const selected = elements[0].getElement().asText()
   const taskDocName = `[task] ${selected.getText()}`
 
   let docId: string = ''
   let docUrl: string = ''
+
   const existingList = DriveApp.getFilesByName(taskDocName)
   if (existingList.hasNext()) {
     const existing = existingList.next()
